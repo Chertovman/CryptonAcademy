@@ -1,0 +1,17 @@
+from flask import Flask, jsonify, request, redirect, url_for
+from src.blockchain import Blockchain
+from src.wallet import Wallet
+
+app = Flask(__name__)
+
+blockchain = Blockchain('bank')
+
+@app.route('/add_transaction', methods=['POST'])
+def add_transaction():
+    json = request.get_json()
+    transaction_keys = ['sender', 'receiver', 'amount']
+    if not all(key in json for key in transaction_keys):
+        return 'Está faltando algum elemento.', 400
+    index = blockchain.add_transaction(json['sender'], json['receiver'], json['amount'])
+    response = {'mensagem': f'Esta transação será adicionada ao bloco {index}'}
+    return jsonify(response), 201
